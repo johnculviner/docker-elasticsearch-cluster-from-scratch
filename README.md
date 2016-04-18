@@ -1,4 +1,4 @@
-# docker-elasticsearch-cluster-from-scratch
+# docker-simple-elasticsearch-cluster
 Provision a *realistic* elasticsearch cluster from scratch locally or on real servers with some sensible constraints:
 - 3 node containerized ElasticSearch cluster, one per host (ES uses lots of resources!)
 - ElasticHQ plugin running in ElasticSearch
