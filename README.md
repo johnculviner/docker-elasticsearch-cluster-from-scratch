@@ -9,14 +9,14 @@ Provision a *realistic* elasticsearch cluster from scratch locally or on real se
 - Persistent mounted data volume (when your container dies you don't lose all your data)
 
 
-##make local virtual machines (optional)
+## make local virtual machines (optional)
 - Run this to make 3 on your local machine with docker-machine.
 - Fixes up boot2docker image to be like any normal linux (python installed for ansible)
 ```
 .\make-the-virtual-machines.sh
 ```
 
-##create the cluster
+## create the cluster
 make sure inventory.ini matches your machines (local virtual or real servers)
 ```
 ansible-playbook create-es-cluster.yml
