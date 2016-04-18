@@ -16,7 +16,7 @@
 
   - name: create and start the elasticsearch containers
     docker:
-      image: elasticsearch:latest
+      image: johnculviner/docker-simple-elasticsearch-cluster
       name: elasticsearch
       state: reloaded
       restart_policy: always
