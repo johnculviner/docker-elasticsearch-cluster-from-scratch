@@ -1,0 +1,39 @@
+- name: provision an elastic search cluster
+  hosts: elastic-cluster
+  tasks:
+
+  #set up the config folder per our volume mounts below
+  - file: path=/opt/data/elasticsearch/config state=directory
+  - template: src=config/elasticsearch.yml dest=/opt/data/elasticsearch/config/elasticsearch.yml
+  - copy: src=config/logging.yml dest=/opt/data/elasticsearch/config/logging.yml
+
+  - name: create a place for data to live on the host (better perf, persistant data over ephemeral container life based data)
+    file: path=/opt/data/elasticsearch/data state=directory
+
+  - name: install docker-py as required for ansible
+    sudo: yes
+    pip: name=docker-py
+
+  - name: create and start the elasticsearch containers
+    docker:
+      image: elasticsearch:latest
+      name: elasticsearch
+      state: reloaded
+      restart_policy: always
+      ports:
+        - "9200:9200"
+        - "9300:9300"
+      volumes:
+        - /opt/data/elasticsearch/config:/usr/share/elasticsearch/config
+        - /opt/data/elasticsearch/data:/usr/share/elasticsearch/data
+
+  - name: create and start kibana container - one per for redundancy
+    docker:
+      name: kibana
+      image: kibana
+      state: reloaded
+      restart_policy: always
+      ports:
+        - "5601:5601"
+      env:
+        ELASTICSEARCH_URL: http://{{ansible_hostname}}:9200
