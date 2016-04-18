@@ -27,6 +27,21 @@
         - /opt/data/elasticsearch/config:/usr/share/elasticsearch/config
         - /opt/data/elasticsearch/data:/usr/share/elasticsearch/data
 
+  - name: install httplib2 to do our app up checks
+    sudo: yes
+    pip: name=httplib2
+
+  - name: Waiting for ElasticSearch app port to spin up
+    wait_for: host={{ansible_host}} port=9200
+
+  - name: Check cluster node count
+    uri: url="http://{{ansible_host}}:9200/_cluster/health" return_content=yes
+    register: es_check_response
+
+  - name: Fail cluster node count is wrong
+    fail: msg="Cluster node count of {{es_check_response.json.number_of_nodes}} vs {{groups['elastic-cluster'].__len__()}} expected"
+    when: es_check_response.json.number_of_nodes != groups['elastic-cluster'].__len__()
+
   - name: create and start kibana container - one per for redundancy
     docker:
       name: kibana
@@ -36,4 +51,4 @@
       ports:
         - "5601:5601"
       env:
-        ELASTICSEARCH_URL: http://{{ansible_hostname}}:9200
+        ELASTICSEARCH_URL: http://{{ansible_host}}:9200
